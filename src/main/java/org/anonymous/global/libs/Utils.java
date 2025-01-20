@@ -2,10 +2,13 @@ package org.anonymous.global.libs;
 
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
@@ -22,6 +25,7 @@ public class Utils {
 
     private final MessageSource messageSource;
     private final HttpServletRequest request;
+    private final DiscoveryClient discoveryClient;
 
     public String getMessage(String code) {
         Locale lo = request.getLocale(); // 사용자 요청 헤더(Accept-Language)
@@ -66,4 +70,74 @@ public class Utils {
 
         return messages;
     }
+
+    /**
+     * 유레카 서버 인스턴스 주소 검색
+     *
+     *      spring.profiles.active : dev = localhost로 되어 있는 주소를 반환.
+     *          - 예) member-service : 최대 2가지만 존재, 1 - 실 서비스 도메인 주소, 2 - localhost
+     * @param serviceId
+     * @param url
+     * @return
+     */
+    public String serviceUrl(String serviceId, String url) {
+        try {
+            List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
+            String profile = System.getenv("spring.profile.active");
+            // 개발모드인지아닌지 확인. 개발모드면 localhost로 찾음
+            boolean isDev = StringUtils.hasText(profile) && profile.contains("dev");
+            String serviceUrl = null;
+            for (ServiceInstance instance : instances) {
+                String uri = instance.getUri().toString();
+                if (isDev && uri.contains("localhost")) {
+                    serviceUrl = uri;
+                } else if (!isDev && !uri.contains("localhost")) {
+                    serviceUrl = uri;
+                }
+            }
+
+            if (StringUtils.hasText(serviceUrl)) {
+                return serviceUrl + url;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * 요청 헤더 : Authorization : bearer ... 받아옴
+     * @return
+     */
+    public String getAuthToken() {
+        String auth = request.getHeader("Authorization");
+
+        return StringUtils.hasText(auth) ? auth.substring(7).trim() : null;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

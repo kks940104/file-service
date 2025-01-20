@@ -3,7 +3,9 @@ package org.anonymous.member;
 import org.anonymous.member.constants.Authority;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MemberUtil {
 
     // 로그인 상태 여부 체크

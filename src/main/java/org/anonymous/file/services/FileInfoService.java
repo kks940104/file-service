@@ -99,7 +99,7 @@ public class FileInfoService {
         FileInfo item = infoRepository.findById(seq).orElseThrow(FileNotFoundException::new);
         return getFilePath(item);
     }
-
+    // 이새끼 봐꿔야함 ㅅㄱ 도메인 다를듯...
     public String getFileUrl(FileInfo item) {
         Long seq = item.getSeq();
         String extension = Objects.requireNonNullElse(item.getExtension(), "");
