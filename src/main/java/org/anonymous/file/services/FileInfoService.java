@@ -5,6 +5,7 @@ import com.querydsl.core.BooleanBuilder;
 import org.anonymous.file.FileProperties;
 import org.anonymous.file.entites.FileInfo;
 import org.anonymous.file.entites.QFileInfo;
+import org.anonymous.global.libs.Utils;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,10 @@ import static org.springframework.data.domain.Sort.Order.asc;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(FileProperties.class)
 public class FileInfoService {
-    private final FileInfoRepository infoRepository;
-
+    private final Utils utils;
     private final FileProperties properties;
-
     private final HttpServletRequest request;
+    private final FileInfoRepository infoRepository;
 
     public FileInfo get(Long seq) {
         FileInfo item = infoRepository.findById(seq).orElseThrow(FileNotFoundException::new);
@@ -99,11 +99,12 @@ public class FileInfoService {
         FileInfo item = infoRepository.findById(seq).orElseThrow(FileNotFoundException::new);
         return getFilePath(item);
     }
-    // 이새끼 봐꿔야함 ㅅㄱ 도메인 다를듯...
+
     public String getFileUrl(FileInfo item) {
         Long seq = item.getSeq();
         String extension = Objects.requireNonNullElse(item.getExtension(), "");
-        return String.format("%s%s%s/%s", request.getContextPath(), properties.getUrl(), getFolder(seq), seq + extension);
+        /*return String.format("%s%s%s/%s", request.getContextPath(), properties.getUrl(), getFolder(seq), seq + extension);*/
+        return utils.getUrl(String.format("%s%s/%s", properties.getUrl(), getFolder(seq), seq + extension));
 
         // http://localhost:3000/uploads/9/959.jpg
     }
