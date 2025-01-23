@@ -172,7 +172,7 @@ public class FileController {
      */
     @GetMapping("/done/{gid}")
     public void processDone(@PathVariable("gid") String gid, @RequestParam(name="location", required = false) String location) {
-        
+        doneService.process(gid, location);
     }
 
     // region Test했던것
