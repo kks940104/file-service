@@ -165,6 +165,16 @@ public class FileController {
         imageService.select(seq);
     }
 
+    /**
+     * 파일 그룹작업 완료 처리
+     * @param gid
+     * @param location
+     */
+    @GetMapping("/done/{gid}")
+    public void processDone(@PathVariable("gid") String gid, @RequestParam(name="location", required = false) String location) {
+        
+    }
+
     // region Test했던것
 
 
